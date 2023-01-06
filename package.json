@@ -1,0 +1,27 @@
+{
+  "name": "run-js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "vue": "^3.2.41"
+  },
+  "devDependencies": {
+    "@types/prismjs": "^1.26.0",
+    "@vitejs/plugin-vue": "^3.2.0",
+    "highlight.js": "^11.7.0",
+    "mocha": "^10.1.0",
+    "monaco-editor": "^0.34.1",
+    "sass": "^1.56.1",
+    "sass-loader": "^13.2.0",
+    "socket.io-client": "^4.5.3",
+    "vite": "^3.2.3",
+    "xterm": "^5.0.0"
+  }
+}

@@ -1,0 +1,334 @@
+<template>
+<div :class="{
+    'message-row': true,
+    'none': result.type == 'none',
+    'command': result.type == 'command',
+    'error': result.type == 'error',
+    'warn': result.type == 'warn',
+    'info': result.type == 'info',
+    'question': result.type == 'question',
+    'success': result.type == 'success',
+  }">
+
+  <div class="indent">
+    <template v-for="(item, index) in Array.from(Array(result.level))" :key="index">
+      <div :class="{
+        'indent-unit': true,
+        'has-line': showLine,
+      }" />
+    </template>
+  </div>
+
+  <div class="message">
+    <div ref="header" :class="{ 
+        'message-header': true, 
+        'hide': !hasHeader, 
+        'expanded': !collapsed && hasBody 
+      }">
+      
+      <span v-if="hasBody" :class="{ 'expand-arrow': true, 'close': collapsed }" @click="handleHeaderClick"></span>
+      <span class="result-text">{{ messageText }}</span>
+    </div>
+    
+    <div v-if="hasBody" :class="{ 'message-body': true, 'message-body-height': !collapsed }">
+      <template v-for="(line, index) in messages" :key="index">
+        <div class="message-line">{{ line }}</div>
+      </template>
+
+      <div v-if="hasTrace" class="message-stack">
+        <pre>{{ stackTrace }}</pre>
+      </div>
+    </div>
+
+    <div v-if="(result.command == 'table')" class="message-table">
+      <Table variant="secondary" :tabularData="result.extra.tabularData" :columns="result.extra.columns" />
+    </div>
+
+    <div v-if="(!!~['dir', 'dirxml'].indexOf(result.command))" class="message-dir">
+      <JsonTree :data="result.extra" />
+    </div>
+  </div>
+
+</div>
+</template>
+
+<style scoped lang="scss">
+$line-color: rgb(100, 100, 100);
+
+.message-row {
+  display: inline-flex;
+  width: 100%;
+  position: relative;
+  flex-flow: row;
+  border-bottom: 1px solid rgba($line-color, .6);
+  padding-left: 1.5rem;
+
+  &::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    left: 0.5rem;
+    margin-top: 4px;
+    background-size: contain;
+    scale: 0.8;
+  }
+
+  &.none, &.info, &.question {
+    .message {
+      color: inherit;
+    }    
+  }
+
+  &.none::before {
+    background: transparent;
+  }
+
+  &.command::before {
+    background: transparent url("data:image/svg+xml,%3Csvg viewBox='0 0 21 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.051 16.267C9.84639 16.4821 9.74607 16.7607 9.75003 17.0392C9.75399 17.3177 9.86091 17.5936 10.0721 17.8035L10.088 17.8194C10.2965 18.0174 10.5632 18.1137 10.8285 18.1098C11.0939 18.1058 11.3579 18.0015 11.5612 17.7969C13.8924 15.4657 16.1985 13.0962 18.5152 10.7478C18.5245 10.7412 18.5324 10.7346 18.5403 10.7267C18.7449 10.5115 18.8452 10.2303 18.8413 9.95182C18.8373 9.67328 18.7291 9.39607 18.5179 9.18618L18.4822 9.15186C16.1761 6.83648 13.8726 4.51317 11.5598 2.20175C11.3579 1.99846 11.0939 1.89418 10.8285 1.89022C10.5632 1.88626 10.2965 1.98262 10.088 2.18195L10.0682 2.20175C9.86091 2.41032 9.75399 2.68489 9.75003 2.9621C9.74607 3.23932 9.84639 3.51917 10.051 3.73434L16.2843 9.97426L10.051 16.267ZM3.21706 16.003C3.01377 16.2168 2.91476 16.4953 2.91872 16.7726C2.92268 17.0511 3.02961 17.327 3.24082 17.5369L3.25666 17.5527C3.46391 17.7507 3.73188 17.8471 3.99721 17.8445C4.26254 17.8405 4.52788 17.7362 4.72984 17.5316C7.01223 15.2492 9.36985 13.0051 11.6826 10.7505C11.6918 10.7439 11.7011 10.7359 11.7103 10.728C11.9149 10.5128 12.0153 10.2317 12.0113 9.95314C12.0073 9.6746 11.8991 9.39739 11.6879 9.1875C9.37909 6.95 7.05843 4.72042 4.74437 2.48556L4.72852 2.4684C4.52656 2.26511 4.26254 2.16215 3.99721 2.15819C3.73188 2.15423 3.46523 2.25059 3.25666 2.4486L3.23686 2.4684C3.02961 2.67697 2.92268 2.95286 2.91872 3.22876C2.91476 3.50597 3.01509 3.78582 3.2197 4.00099L9.44774 9.97294L3.21706 16.003Z' fill='white'/%3E%3C/svg%3E") no-repeat 50% 50%;
+  }
+
+  &.error .message-header {
+    color: #EC0000;
+  }
+  &.error::before {
+    background: transparent url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.109863 9.9888C0.109863 15.436 4.54154 19.8677 9.98877 19.8677C15.436 19.8677 19.8677 15.436 19.8677 9.9888C19.8677 4.54157 15.436 0.109894 9.98877 0.109894C4.54154 0.109894 0.109863 4.54157 0.109863 9.9888ZM6.45476 14.6205C6.17376 14.6205 5.89298 14.5133 5.6785 14.2989C5.24976 13.8703 5.24976 13.1753 5.6785 12.7468L8.43651 9.98876L5.67871 7.23105C5.24997 6.8023 5.24997 6.10727 5.67871 5.67874C6.10745 5.25022 6.80227 5.25022 7.23101 5.67874L9.98873 8.43654L12.7465 5.67874C13.1748 5.25022 13.8703 5.25022 14.2986 5.67874C14.7274 6.10749 14.7274 6.80252 14.2986 7.23105L11.5409 9.9888L14.2988 12.7468C14.7276 13.1753 14.7276 13.8703 14.2988 14.2989C14.0846 14.5131 13.8036 14.6205 13.5228 14.6205C13.242 14.6205 12.9608 14.5133 12.7467 14.2989L9.9888 11.541L7.23102 14.2989C7.01654 14.5131 6.73576 14.6205 6.45476 14.6205Z' fill='%23EC0000'/%3E%3C/svg%3E%0A") no-repeat 50% 50%;
+  }
+
+  &.warn .message-header {
+    color: #FF9D00;
+  }
+  &.warn::before {
+    background: transparent url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M18.9571 19.4528H9.98881V19.453H1.02052C0.336895 19.453 -0.102387 18.727 0.215055 18.1216L9.18357 1.01194C9.52406 0.362352 10.4538 0.362352 10.7943 1.01194L19.7626 18.1213C20.0798 18.7268 19.6407 19.4528 18.9571 19.4528ZM9.98881 14.1799C9.64766 14.1799 9.3671 13.9114 9.35217 13.5704L8.76449 7.89995C8.71114 7.18758 9.27446 6.58035 9.98881 6.58035C10.7032 6.58035 11.2667 7.1878 11.2131 7.89995L10.6255 13.5704C10.6105 13.9112 10.33 14.1799 9.98881 14.1799ZM9.98793 17.3765C10.5488 17.3765 11.0035 16.9218 11.0035 16.3609C11.0035 15.8 10.5488 15.3454 9.98793 15.3454C9.42706 15.3454 8.97238 15.8 8.97238 16.3609C8.97238 16.9218 9.42706 17.3765 9.98793 17.3765Z' fill='%23FF9D00'/%3E%3C/svg%3E") no-repeat 50% 50%;
+  }
+
+  &.info::before {
+    background: transparent url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.98877 0.109894C4.54154 0.109894 0.109863 4.54157 0.109863 9.9888C0.109863 15.436 4.54154 19.8677 9.98877 19.8677C15.436 19.8677 19.8677 15.436 19.8677 9.9888C19.8677 4.54157 15.436 0.109894 9.98877 0.109894ZM11.6805 14.9465L11.5661 15.4281C11.5163 15.6384 11.3602 15.8092 11.1538 15.8733C10.4366 16.0964 9.67572 16.1504 8.93107 16.0294C8.42812 15.9475 8.08675 15.4736 8.16842 14.9706L8.84172 10.8314C8.92141 10.3414 8.66236 9.88408 8.24964 9.67948C7.99169 9.55171 7.85339 9.26566 7.91991 8.98554L8.03428 8.50389C8.08412 8.29358 8.2402 8.12278 8.44656 8.05846C9.16377 7.83542 9.92467 7.78141 10.6693 7.90237C11.1723 7.98426 11.5136 8.45823 11.432 8.96117L10.7587 13.1004C10.679 13.5904 10.938 14.0477 11.3507 14.2523C11.6087 14.3803 11.7468 14.6664 11.6805 14.9465ZM10.5486 6.93644C9.70601 6.93644 9.02283 6.25326 9.02283 5.4107C9.02283 4.56813 9.70601 3.88495 10.5486 3.88495C11.3911 3.88495 12.0743 4.56813 12.0743 5.4107C12.0743 6.25326 11.3911 6.93644 10.5486 6.93644Z' fill='%233E60B5'/%3E%3C/svg%3E%0A") no-repeat 50% 50%;
+  }
+
+  &.question::before {
+    background: transparent url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M19.8677 9.9888C19.8677 15.4448 15.4447 19.8677 9.98877 19.8677C4.5328 19.8677 0.109863 15.4448 0.109863 9.9888C0.109863 4.53283 4.5328 0.109894 9.98877 0.109894C15.4447 0.109894 19.8677 4.53283 19.8677 9.9888ZM9.98877 13.0359C9.50382 13.0359 9.11064 12.6427 9.11064 12.1578V11.1604C9.11064 10.9187 9.21031 10.6878 9.38593 10.522L11.1604 8.8468C11.4487 8.5445 11.6072 8.14847 11.6072 7.73004V7.66374C11.6072 7.22358 11.4335 6.81174 11.118 6.5044C10.8028 6.19727 10.389 6.0346 9.9453 6.0458C9.07661 6.06819 8.37016 6.81921 8.37016 7.71994C8.37016 8.20489 7.97698 8.59807 7.49204 8.59807C7.00709 8.59807 6.61391 8.20489 6.61391 7.71994C6.61391 5.87544 8.08807 4.33675 9.90008 4.29021C10.8184 4.26628 11.6866 4.60611 12.3437 5.2467C13.0012 5.8873 13.3634 6.74588 13.3634 7.66374V7.73004C13.3634 8.61409 13.024 9.44985 12.4076 10.0834C12.3988 10.0924 12.39 10.1012 12.381 10.1098L10.8669 11.5391V12.1578C10.8669 12.6427 10.4737 13.0359 9.98877 13.0359ZM9.98877 15.9074C9.69899 15.9074 9.4158 15.791 9.21163 15.5868C9.16114 15.5364 9.11723 15.4793 9.07552 15.42C9.03601 15.3605 9.00308 15.2968 8.97454 15.2312C8.94819 15.1629 8.92624 15.0951 8.91307 15.0248C8.8977 14.9546 8.89112 14.8822 8.89112 14.8097C8.89112 14.7395 8.8977 14.667 8.91307 14.5968C8.92624 14.5265 8.94819 14.456 8.97454 14.3904C9.00308 14.3245 9.03601 14.2609 9.07552 14.2016C9.11723 14.1404 9.16114 14.0855 9.21163 14.0348C9.46629 13.7801 9.84608 13.6616 10.2039 13.734C10.2742 13.7494 10.342 13.7691 10.4081 13.7977C10.4739 13.824 10.5376 13.8591 10.5967 13.8987C10.6581 13.9384 10.713 13.9845 10.7637 14.0348C10.8162 14.0853 10.8601 14.1401 10.902 14.2016C10.9415 14.2611 10.9745 14.3248 11.003 14.3904C11.0293 14.4563 11.0513 14.5265 11.0643 14.5968C11.0798 14.667 11.0864 14.7395 11.0864 14.8097C11.0864 14.8822 11.0798 14.9546 11.0643 15.0246C11.0511 15.0949 11.0293 15.1629 11.003 15.231C10.9745 15.2968 10.9415 15.3605 10.902 15.4198C10.8603 15.4791 10.8162 15.5359 10.7637 15.5866C10.7132 15.6369 10.6583 15.683 10.5967 15.7227C10.5374 15.7623 10.4737 15.7974 10.4081 15.8237C10.342 15.8523 10.2742 15.872 10.2039 15.885C10.1315 15.9008 10.0612 15.9074 9.98877 15.9074Z' fill='%23427DF4'/%3E%3C/svg%3E%0A") no-repeat 50% 50%;
+  }
+
+  &.success .message-header {
+    color: #28C937;
+  }
+  &.success::before {
+    background: transparent url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M19.8677 9.9888C19.8677 15.4448 15.4447 19.8677 9.98877 19.8677C4.5328 19.8677 0.109863 15.4448 0.109863 9.9888C0.109863 4.53283 4.5328 0.109894 9.98877 0.109894C15.4447 0.109894 19.8677 4.53283 19.8677 9.9888ZM8.55062 14.2697H8.55699C8.83996 14.2697 9.10955 14.1483 9.29747 13.9362L15.1197 7.35025C15.481 6.94149 15.4426 6.31714 15.0338 5.95579C14.6248 5.59444 14.0005 5.63286 13.6394 6.04163L8.56687 11.7791L6.34697 9.2009C5.99089 8.78752 5.3672 8.74098 4.9536 9.09684C4.54 9.45292 4.49346 10.0768 4.84954 10.4902L7.80839 13.9265C7.99455 14.1426 8.26523 14.2677 8.55062 14.2697Z' fill='%2328C937'/%3E%3C/svg%3E%0A") no-repeat 50% 50%;
+  }
+
+  .indent {
+    display: flex;
+    position: relative;
+
+    &-unit {
+      width: 1rem;
+
+      &.has-line {
+        border-right: 1px dashed $line-color;
+      }
+    }
+  }
+
+  .message {
+    flex: auto;
+    padding-left: 0.5rem;
+  }
+
+  .hide {
+    display: none!important;
+  }
+}
+
+.message-header {
+  display: flex;
+  width: 100%;
+  position: relative;
+  flex-flow: row;
+  align-items: center;
+
+  &.expanded {
+    border-bottom: 1px dashed $line-color;
+  }
+
+  .expand-arrow {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    position: relative;
+    flex: none;
+    cursor: pointer;
+
+    &::before, &::after {
+      content: '';
+      top: .5rem;
+      position: absolute;
+      width: .625rem;
+      height: .15rem;
+      background-color: $line-color;
+      display: inline-block;
+      transition: all .3s ease;
+      border-radius: .3rem;
+    }
+
+    &::before {
+      left: 0;
+      transform: rotate(45deg);
+    }
+
+    &::after {
+      right: 0;
+      transform: rotate(-45deg);
+    }
+
+    &.close {
+      &::before {
+        transform: rotate(-45deg);
+      }
+
+      &::after {
+        transform: rotate(45deg);
+      }
+    }
+  }  
+
+  .result-text {
+    flex: auto;
+    margin-left: 0.5rem;
+  }
+}
+
+.message-body {
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  color: unset;
+  padding-left: 1.35rem;
+  border-radius: 0 0 0.2rem 0.2rem;
+  transition: all .3s ease-in-out;
+
+  &-height {
+    max-height: v-bind(contentHeight);
+  }
+
+  &-content {
+    padding: 1rem;
+  }
+}
+
+.message-stack {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  padding-left: 1rem;
+
+  pre {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    overflow: auto;
+    -ms-overflow-style: scrollbar;
+
+    code {
+      font-size: inherit;
+      color: inherit;
+      word-break: normal;
+    }
+  }
+}
+
+.message-table {
+  padding: 0.675rem 1rem 1rem 0;
+}
+
+.message-dir {
+  display: block;
+  position: relative;
+  padding: 0.675rem 1rem 1rem 0;
+}
+</style>
+
+<script>
+import Table from '../lib/components/Table.vue';
+import JsonTree from '../lib/json-pretty/Tree.vue';
+
+export default {
+  name: 'OutputRow',
+  components: {
+    Table,
+    JsonTree
+  },
+  props: {
+    result: {
+      type: Object,
+      required: true
+    },
+    showLine: {
+      type: Boolean,
+      default: true
+    },
+  },
+  data() {
+    return {
+      collapsed: false
+    };
+  },
+  computed: {
+    contentHeight() {
+      if (this.$el) {
+        const rect = this.$el.getBoundingClientRect();
+        const headRect = this.$refs.header.getBoundingClientRect();
+
+        return `${rect.height - headRect.height}px`;
+      }
+      return '1.75rem';
+    },
+    messageText() {
+      if (this.result.text) {
+        return this.result.text;
+
+      } else if (this.result.messages && Array.isArray(this.result.messages) && this.result.messages.length) {
+        return this.result.messages[0];
+      }
+      return '';
+    },
+    messages() {
+      let arr = [];
+      if (this.result.messages && this.result.messages.length > 1) {
+        arr = arr.concat(this.result.messages.slice(1));
+      }
+      if (this.result.data && this.result.data.length) {
+        arr = arr.concat(this.result.data.map(d => `${d}`));
+      }
+      return arr;
+    },
+    stackTrace() {
+      if (this.result.extra && this.result.extra.trace && this.result.extra.trace.length) {
+        const trace = this.result.extra.trace;
+        return trace.map(x => `${x}`.trim()).join('\n');
+      }
+      return '';
+    },
+    hasHeader() {
+      return !~['table', 'dir', 'dirxml'].indexOf(this.result.command);
+    },
+    hasBody() {
+      if (this.result.messages && Array.isArray(this.result.messages) && this.result.messages.length > 1) {
+        return true;
+      }
+      if (!!~['table', 'dir', 'dirxml'].indexOf(this.result.command)) return false;
+      return (this.result.data && Array.isArray(this.result.data) && this.result.data.length) || this.result.extra;
+    },
+    hasTrace() {
+      return !!(this.result.extra && this.result.extra.trace && Array.isArray(this.result.extra.trace) && this.result.extra.trace.length);
+    },
+  },
+  mounted() {
+    this.$nextTick(() => this.collapsed = true);
+  },
+  methods: {
+    handleHeaderClick(e) {
+      const collapsed = this.collapsed;
+      this.collapsed = !collapsed;
+    }
+  }
+};
+</script>
