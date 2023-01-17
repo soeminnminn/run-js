@@ -2,9 +2,9 @@
   <div :class="{
     'vjs-tree': true,
     'is-virtual': virtual,
-    'has-line-number': showLineNumber,
   }" :style="{
-    ...style
+    ...style,
+    ...leftPadding
   }"
   @scroll="handleTreeScroll">
     
@@ -62,28 +62,6 @@
   
   </div>
 </template>
-
-<style scoped lang="scss">
-@import './themes.scss';
-
-.vjs-tree {
-  font-family: 'Monaco', 'Menlo', 'Consolas', 'Bitstream Vera Sans Mono', monospace;
-  font-size: 14px;
-  text-align: left;
-
-  &.is-virtual {
-    overflow: auto;
-
-    :deep(.vjs-tree-node) {
-      white-space: nowrap;
-    }
-  }
-
-  &.has-line-number {
-    padding-left: v-bind(leftPadding);
-  }
-}
-</style>
 
 <script>
 import { emitError, jsonFlatten } from './utils';
@@ -195,7 +173,11 @@ export default {
       },
     },
     leftPadding() {
-      return `${Number(this.originFlatData.length.toString().length) * 12}px`;
+      if (this.showLineNumber) {
+        const paddingLeft = `${Number(this.originFlatData.length.toString().length) * 12}px`;
+        return { paddingLeft };
+      }
+      return {};
     }
   },
   data() {

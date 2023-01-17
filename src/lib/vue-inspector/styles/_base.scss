@@ -1,0 +1,237 @@
+.dom-node-preview {
+  .html-open-tag {
+    .tag-name {
+      text-transform: lowercase;
+    }
+  }
+
+  .html-close-tag {
+    &.offset-left {
+      margin-left: -0.75rem;
+    }
+
+    .tag-name {
+      text-transform: lowercase;
+    }
+  }
+}
+
+.object-preview {
+
+  .object-description {
+    font-style: italic;
+  }
+
+  .preview {
+    font-style: italic;
+  }
+}
+
+.object-name {
+  .dimmed {
+    opacity: 0.6;
+  }
+}
+
+.object-value {
+
+  &.function-prefix {
+    font-style: italic;
+  }
+
+  &.function-name {
+    font-style: italic;
+  }
+}
+
+.tree-view-outline {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.tree-node {
+  cursor: default;
+  box-sizing: border-box;
+  list-style: none;
+
+  .preview-container {
+    display: flex;
+    flex-flow: row;
+    position: relative;
+  }
+
+  .placeholder {
+    white-space: pre;
+    margin-right: 0.1875rem;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+  }
+  
+  .arrow {
+    margin-right: 0.825rem;
+    display: inline-block;
+    width: 0;
+    cursor: pointer;
+    user-select: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      display: inline-block;
+      margin-top: 0.2rem;
+      vertical-align: 0.4rem;
+      border-top: 0.6em solid;
+      border-right: 0.4em solid transparent;
+      border-bottom: 0;
+      border-left: 0.4em solid transparent;
+      transition: transform 0.2s;
+      transform: rotate(-90deg);
+      -webkit-transform: rotate(-90deg);
+    }
+
+    &.expanded::after {
+      transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+    }
+  }
+
+  .child-nodes-container {
+    margin: 0;
+    padding-left: 0.75rem;
+  }
+}
+
+.table-inspector {
+  position: relative;
+  line-height: 120%;
+  box-sizing: border-box;
+  cursor: default;
+}
+
+.table-inspector .header-container {
+  top: 0;
+  height: 1.0625rem;
+  left: 0;
+  right: 0;
+  overflow-x: hidden;
+
+  table {
+    table-layout: fixed;
+    border-spacing: 0;
+    border-collapse: separate;
+    height: 100%;
+    width: 100%;
+    margin: 0
+  }
+}
+
+.table-inspector .data-container {
+  tr {
+    display: table-row;
+  }
+
+  td {
+    box-sizing: border-box;
+    border: none;
+    height: 1rem;
+    vertical-align: top;
+    padding: 0.0625rem 0.25rem;
+    -webkit-user-select: text;
+    user-select: text;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 0.875rem;
+  }
+
+  div {
+    position: static;
+    top: 1.0625rem;
+    bottom: 0;
+    overflow-y: overlay;
+    transform: translateZ(0);
+    left: 0;
+    right: 0;
+    overflow-x: hidden
+  }
+
+  table {
+    position: static;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-top: 0 none transparent;
+    margin: 0;
+    table-layout: fixed;
+    border-spacing: 0;
+    border-collapse: separate;
+    width: 100%;
+    line-height: 120%;
+  }
+}
+
+.table-inspector .table-header {
+  position: relative;
+  height: auto;
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  line-height: 0.875rem;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+
+  .sort-icon-container {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    bottom: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .header-text {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 120%;
+  }
+
+  .sort-icon {
+    display: block;
+    margin-right: 0.1875rem;
+    width: 0.5rem;
+    height: 0.4375rem;
+    margin-top: -0.0375rem;
+    font-size: 0.75rem;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+  }
+}
+
+.table-inspector {
+  .border-none {
+    border-left: none;
+  }
+}

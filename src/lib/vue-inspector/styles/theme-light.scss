@@ -1,0 +1,114 @@
+@import './base';
+@import './chrome-light';
+
+.dom-node-preview {
+  .html-open-tag {
+    color: #{map-get($chrome-light, "HTML_TAG_COLOR")};
+
+    .tag-name {
+      color: #{map-get($chrome-light, "HTML_TAGNAME_COLOR")};
+    }
+
+    .html-attribute-name {
+      color: #{map-get($chrome-light, "HTML_ATTRIBUTE_NAME_COLOR")};
+    }
+
+    .html-attribute-value {
+      color: #{map-get($chrome-light, "HTML_ATTRIBUTE_VALUE_COLOR")};
+    }
+  }
+
+  .html-close-tag {
+    color: #{map-get($chrome-light, "HTML_TAG_COLOR")};
+
+    .tag-name {
+      color: #{map-get($chrome-light, "HTML_TAGNAME_COLOR")};
+    }
+  }
+
+  .html-comment {
+    color: #{map-get($chrome-light, "HTML_COMMENT_COLOR")};
+  }
+
+  .html-doctype {
+    color: #{map-get($chrome-light, "HTML_DOCTYPE_COLOR")};
+  }
+}
+
+.object-name {
+  color: #{map-get($chrome-light, "OBJECT_NAME_COLOR")};
+}
+
+.object-value {
+  &.null {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_NULL_COLOR")};
+  }
+
+  &.undefined {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_UNDEFINED_COLOR")};
+  }
+
+  &.regexp {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_REGEXP_COLOR")};
+  }
+
+  &.string {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_STRING_COLOR")};
+  }
+
+  &.symbol {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_SYMBOL_COLOR")};
+  }
+
+  &.number {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_NUMBER_COLOR")};
+  }
+
+  &.boolean {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_BOOLEAN_COLOR")};
+  }
+
+  &.function-prefix {
+    color: #{map-get($chrome-light, "OBJECT_VALUE_FUNCTION_PREFIX_COLOR")};
+  }
+}
+
+.tree-node {
+  .placeholder {
+    font-size: #{map-get($chrome-light, "ARROW_FONT_SIZE")};
+  }
+  
+  .arrow {
+    color: #{map-get($chrome-light, "ARROW_COLOR")};
+  }
+}
+
+.table-inspector {
+  border: 1px solid #{map-get($chrome-light, "TABLE_BORDER_COLOR")};
+}
+
+.table-inspector .data-container {
+  table {
+    background-image: #{map-get($chrome-light, "TABLE_DATA_BACKGROUND_IMAGE")};
+    background-size: #{map-get($chrome-light, "TABLE_DATA_BACKGROUND_SIZE")};
+  }
+}
+
+.table-inspector .table-header {
+  background-color: #{map-get($chrome-light, "TABLE_TH_BACKGROUND_COLOR")};
+  border-bottom: 1px solid #{map-get($chrome-light, "TABLE_BORDER_COLOR")};
+
+  &:hover {
+    background-color: #{map-get($chrome-light, "TABLE_TH_HOVER_COLOR")};
+  }
+
+  .sort-icon {
+    color: #{map-get($chrome-light, "TABLE_SORT_ICON_COLOR")};
+  }
+}
+
+.table-inspector {
+  .border-solid {
+    border-left: 1px solid #{map-get($chrome-light, "TABLE_BORDER_COLOR")};
+  }
+}
