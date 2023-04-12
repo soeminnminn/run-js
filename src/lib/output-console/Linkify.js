@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 import { tokenize, options, Options } from 'linkifyjs';
 
 function escapeText(text) {

@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 import ObjectName from '../object/ObjectName.js';
 import ObjectPreview from './ObjectPreview.js';

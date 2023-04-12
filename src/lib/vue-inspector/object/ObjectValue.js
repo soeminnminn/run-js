@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 export default {
   name: 'ObjectValue',

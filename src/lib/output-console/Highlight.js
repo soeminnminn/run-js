@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
 import json from 'highlight.js/lib/languages/json';

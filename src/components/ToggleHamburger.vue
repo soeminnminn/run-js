@@ -74,7 +74,7 @@
 }
 </style>
 
-<script>
+<script lang="js">
 
 export default {
   name: 'ToggleHamburger',

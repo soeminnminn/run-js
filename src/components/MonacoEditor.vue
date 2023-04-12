@@ -30,7 +30,7 @@
 }
 </style>
 
-<script>
+<script lang="js">
 import { ref, shallowRef } from 'vue';
 import * as monaco from 'monaco-editor';
 

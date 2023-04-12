@@ -78,7 +78,7 @@
 }
 </style>
 
-<script>
+<script lang="js">
 export default {
   name: 'Modal',
   props: {

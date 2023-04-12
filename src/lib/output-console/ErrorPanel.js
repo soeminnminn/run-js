@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 import { TreeView } from '../vue-inspector';
 import Linkify from './Linkify.js';

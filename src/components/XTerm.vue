@@ -13,7 +13,7 @@
 }
 </style>
 
-<script>
+<script lang="js">
 // https://github.com/lflxp/gin-xterm/blob/master/src/views/pty/xterm3.vue
 import { Terminal } from 'xterm';
 import '~xterm/css/xterm.css';

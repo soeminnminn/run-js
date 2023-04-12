@@ -4,11 +4,7 @@
       <div class="navbar-brand">
         <img src="./assets/logo.svg" class="navbar-logo" alt="Logo" />
       </div>
-      <div v-if="multiDoc" class="navbar-tabs">
-        <Tab :bottom-border="false">
-          <TabItem selected><img class="icon" src="/icons/file-dark.svg" alt="" />Untitled 0</TabItem>
-          <TabAdd />
-        </Tab>
+      <div class="navbar-tabs">
       </div>
       <div class="navbar-actions">
         <Button :small="true" variant="success" :loading="isRunning" :disabled="(!code)" @click="onRunClick"><img class="icon" src="/icons/run.svg" alt=""/>Run</Button>
@@ -30,11 +26,10 @@
   </div>
 </template>
 
-<script>
+<script lang="js">
 import Button from './components/BsButton.vue';
 import MonacoEditor from './components/MonacoEditor.vue';
 import { SplitPanes, Pane } from './lib/split-panes';
-import { Tab, TabItem, TabAdd } from './lib/nav-tab';
 import { OutputConsole } from './lib/output-console';
 import executer from './lib/executer';
 
@@ -44,14 +39,12 @@ export default {
     Button,
     Pane, SplitPanes,
     MonacoEditor,
-    Tab, TabItem, TabAdd,
     OutputConsole
   },
   data() {
     return {
       isRunning: false,
       code: '',
-      multiDoc: true
     };
   },
   computed: {

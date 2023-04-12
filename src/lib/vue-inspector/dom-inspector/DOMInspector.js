@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 import DOMNodePreview from './DOMNodePreview.js';
 import TreeView from '../tree-view/TreeView.vue';

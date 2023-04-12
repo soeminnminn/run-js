@@ -1,4 +1,21 @@
-<style scoped>
+<template>
+  <component :is="tagName" :class="{
+    'btn': true,
+    [variantClass]: true,
+    'btn-sm': small,
+    'active': active
+  }" v-bind="attrs" @click="handleClick" >
+    <span v-if="loading" :class="{
+      'spinner-border': spinnerStyle == 'border',
+      'spinner-grow': spinnerStyle == 'grow',
+      'spinner-border-sm': spinnerStyle == 'border' && small,
+      'spinner-grow-sm': spinnerStyle == 'grow' && small,
+    }" role="status" aria-hidden="true" />
+    <slot></slot>
+  </component>
+</template>
+
+<style>
 .btn {
   --bs-btn-padding-x: 0.75rem;
   --bs-btn-padding-y: 0.375rem;
@@ -374,94 +391,70 @@
   box-shadow: var(--bs-btn-focus-box-shadow);
 }
 
-.btn :deep(.icon) {
+.btn .icon {
   margin-right: 0.25rem;
 }
 
-.btn :deep(.spinner) {
-  line-height: 1.15;
-  position: absolute;
-  top: 25%;
-  left: auto;
-  right: 1rem;
-  opacity: 1;
-  transition-property: padding, opacity;
-  transition-duration: 0.2s, 0.2s;
-  transition-timing-function: ease-in, ease;
-  transition-delay: 0s, 0.2s;
-}
-.btn :deep(.spinner) span {
-  box-sizing: border-box;
+.spinner-border, .spinner-grow {
   display: inline-block;
-  position: absolute;
-  right: 0;
-  top: 0.15rem;
-  width: 1rem;
-  height: 1rem;
-  opacity: 1;
-  border: 3.4px solid #888;
+  width: var(--bs-spinner-width);
+  height: var(--bs-spinner-height);
+  vertical-align: var(--bs-spinner-vertical-align);
   border-radius: 50%;
-  animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #888 transparent transparent transparent;
+  margin-right: 0.25rem;
+  animation: var(--bs-spinner-animation-speed) linear infinite var(--bs-spinner-animation-name);
 }
-.btn :deep(.spinner) span:nth-child(1) {
-  animation-delay: 0.45s;
+
+.spinner-border {
+  --bs-spinner-width: 2rem;
+  --bs-spinner-height: 2rem;
+  --bs-spinner-vertical-align: -0.125em;
+  --bs-spinner-border-width: 0.25em;
+  --bs-spinner-animation-speed: 0.75s;
+  --bs-spinner-animation-name: spinner-border;
+  border: var(--bs-spinner-border-width) solid currentcolor;
+  border-right-color: transparent;
+  animation: 0.75s linear infinite spinner-border;
 }
-.btn :deep(.spinner) span:nth-child(2) {
-  animation-delay: 0.3s;
+
+.spinner-border-sm {
+  --bs-spinner-width: 1rem;
+  --bs-spinner-height: 1rem;
+  --bs-spinner-border-width: 0.2em;
 }
-.btn :deep(.spinner) span:nth-child(3) {
-  animation-delay: 0.15s;
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
 }
-.btn-loading {
-  padding-right: 2rem !important;
+
+.spinner-grow {
+  --bs-spinner-width: 2rem;
+  --bs-spinner-height: 2rem;
+  --bs-spinner-vertical-align: -0.125em;
+  --bs-spinner-animation-speed: 0.75s;
+  --bs-spinner-animation-name: spinner-grow;
+  background-color: currentcolor;
+  opacity: 0;
+  animation: 0.75s linear infinite spinner-grow;
 }
-.btn:not(:disabled) {
-  transition-delay: 0.2s;
+
+.spinner-grow-sm {
+  --bs-spinner-width: 1rem;
+  --bs-spinner-height: 1rem;
 }
-.btn:not(:disabled) :deep(.spinner) span {
-  box-shadow: 0 0 0 0.2rem #888 inset;
-  border: 7.4px solid transparent;
-  -webkit-transition: all 0.4s;
-  transition: all 0.4s;
-}
-.btn:not(:disabled) :deep(.spinner) span:nth-child(1) {
-  transform: rotate(0deg) !important;
-}
-.btn:not(:disabled) :deep(.spinner) span:nth-child(2) {
-  transform: rotate(90deg) !important;
-}
-.btn:not(:disabled) :deep(.spinner) span:nth-child(3) {
-  transform: rotate(180deg) !important;
-}
-.btn:not(:disabled) :deep(.spinner) span:nth-child(4) {
-  transform: rotate(270deg) !important;
-}
-@keyframes spinner {
+
+@keyframes spinner-grow {
   0% {
-    transform: rotate(0deg);
+    transform: scale(0);
   }
-  100% {
-    transform: rotate(360deg);
+  50% {
+    opacity: 1;
+    transform: none;
   }
 }
 </style>
 
-<script>
-import { defineComponent, h } from 'vue';
-
-const Spinner = defineComponent({
-  name: 'Spinner',
-  render() {
-    return h('span', { class: 'spinner' }, [
-      h('span'),
-      h('span'),
-      h('span'),
-      h('span')
-    ]);
-  },
-});
-
+<script lang="js">
 const variants = [
   'none', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark', 'link', 
   'outline-primary', 'outline-secondary', 'outline-success', 'outline-danger', 'outline-warning', 
@@ -470,9 +463,6 @@ const variants = [
 
 export default {
   name: 'bs-button',
-  components: {
-    Spinner
-  },
   props: {
     disabled: {
       type: Boolean,
@@ -494,36 +484,69 @@ export default {
     },
     type: {
       type: String,
-      default: 'button'
+      default: 'button',
+      validator: v => !!~['button', 'reset', 'submit'].indexOf(v),
     },
     href: {
       type: String
+    },
+    toggle: {
+      type: Boolean,
+      default: false,
+    },
+    pressed: {
+      type: Boolean,
+      default: false,
+    }, 
+    spinnerStyle: {
+      type: String,
+      default: 'border',
+      validator: v => !!~[ 'border', 'grow' ].indexOf(v),
     }
   },
-  render() {
-    const variantClass = this.variant == 'none' ? '' : `btn-${this.variant}`;
-    const attrs = { class: `btn ${variantClass}`, type: this.type };
-    const children = [ this.$slots.default({}) ];
-
-    if (this.small) {
-      attrs.class += ' btn-sm';
-    }
-
-    if (this.loading) {
-      children.push(h(Spinner));
-      attrs.class += ' btn-loading';
-    }
-
-    if (this.disabled || this.loading) {
-      attrs.disabled = true;
-    }
-    
-    if (this.href) {
-      attrs.href = this.href;
-      attrs.role = 'button';
-    }
-
-    return h(this.href ? 'a' : 'button', attrs, children);
+  emits: [ 'click' ],
+  data() {
+    return {
+      active: this.pressed
+    };
   },
+  computed: {
+    tagName() {
+      return this.href ? 'a' : 'button';
+    },
+    variantClass() {
+      return this.variant == 'none' ? '' : `btn-${this.variant}`;
+    },
+    attrs() {
+      const attrs = { type: this.type };
+      if (this.disabled || this.loading) {
+        attrs.disabled = true;
+        attrs['aria-disabled'] = true;
+      }
+      
+      if (this.href) {
+        attrs.href = this.href;
+        attrs.role = 'button';
+      }
+
+      if (this.toggle) {
+        attrs['data-bs-toggle'] = true;
+      }
+
+      if (this.pressed) {
+        attrs['aria-pressed'] = true;
+      }
+      return attrs;
+    },
+  },
+  methods: {
+    handleClick(e) {
+      if (this.toggle) {
+        const active = this.active;
+        this.active = !active;
+      }
+      this.$emit('click', e);
+    }
+  }
 }
 </script>

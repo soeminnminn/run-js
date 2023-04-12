@@ -1,4 +1,4 @@
-import { defineComponent, h, normalizeStyle } from 'vue';
+import { h } from 'vue';
 
 import TableHeader from './TableHeader.js';
 

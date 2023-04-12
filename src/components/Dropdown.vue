@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="dropdown"
-    :class="{ dropup: top }"
-    @click="toggle" >
+  <div class="dropdown" :class="{ dropup: top }" @click="toggle" >
     <slot />
     <transition :name="transition">
       <div
@@ -72,7 +69,7 @@
 }
 </style>
 
-<script>
+<script lang="js">
 export default {
   name: 'Dropdown',
   props: {

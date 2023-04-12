@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 import ObjectValue from '../object/ObjectValue.js';
 import { hasOwnProperty } from '../utils.js';

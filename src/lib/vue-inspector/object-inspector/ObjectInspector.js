@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 import TreeView from '../tree-view/TreeView.vue';
 import ObjectRootLabel from './ObjectRootLabel.js';

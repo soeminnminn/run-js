@@ -4,7 +4,7 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/Console/table
  */
 
-import { defineComponent, h } from 'vue';
+import { h } from 'vue';
 
 import DataContainer from './DataContainer.js';
 import HeaderContainer from './HeaderContainer.js';
