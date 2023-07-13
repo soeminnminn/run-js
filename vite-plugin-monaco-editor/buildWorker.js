@@ -118,13 +118,13 @@ export async function buildAll(options, resolvedConfig) {
   const distPath = options.customDistPath
     ? options.customDistPath(
         resolvedConfig.root,
-        resolvedConfig.build.outDir,
-        resolvedConfig.base
+        resolvedConfig.build.outDir
+        // resolvedConfig.base
       )
     : path.join(
         resolvedConfig.root,
         resolvedConfig.build.outDir,
-        resolvedConfig.base,
+        // resolvedConfig.base,
         options.publicPath
       );
 

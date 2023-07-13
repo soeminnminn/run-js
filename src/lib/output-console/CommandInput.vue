@@ -27,6 +27,7 @@
 	box-sizing: content-box;
   background: none;
 	border: none;
+  color: inherit;
 
 	&::placeholder {
 		color: #9ca6af;

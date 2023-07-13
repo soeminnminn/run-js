@@ -1,11 +1,12 @@
 <template>
   <Teleport to="body">
-    <div class="modal-mask" v-if="visible" @click="onWrapClick">
-      <div class="modal-wrapper">
+    <div :class="{'modal-mask': true, 'dark': colorScheme == 'dark'}" v-if="visible" @click="onWrapClick">
+      <div :class="{ 'modal-wrapper': true, 'modal-scrollable': scrollable }">
         <div ref="modalContainer" class="modal-container" :style="containerStyle">
           <div class="modal-header" v-if="!headerHide">
             <slot name="header" />
           </div>  
+          <button type="button" v-if="showClose" class="modal-close" @click="close">&times;</button>
 
           <div class="modal-body">
             <slot />
@@ -22,35 +23,41 @@
 
 <style scoped>
 .modal-mask {
+  display: flex;
   position: fixed;
   z-index: 9998;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
-  display: table;
   transition: opacity 0.3s ease;
-}
-
-.modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-container {
-  margin: 0px auto;
+  display: inline-flex;
+  flex-flow: column;
+  position: relative;
+  margin: auto 0;
   background-color: #fff;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
-  max-width: 80% !important;
+  max-height: 94vh;
 }
 
 .modal-header {
-  padding: 0.75rem 1rem 0.25rem 1rem;
-  border-bottom: 1px solid #e8eaec;
+  position: relative;
+  display: inline-flex;
+  flex-flow: row;
+  width: 100%;
+  align-items: center;
+  padding: 0.25rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  min-height: 2.415rem;
 }
 
 .modal-header :deep(h3) {
@@ -59,13 +66,36 @@
   font-weight: 500;
 }
 
+.modal-close {
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+  color: transparent!important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23999'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 0.625rem;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  position: absolute;
+  right: 0.215rem;
+  top: 0.1rem;
+}
+.modal-close:hover {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23eee'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+  background-color: rgb(232, 17, 35);
+}
+
 .modal-body {
-  max-height: calc(100vh - 20em);
+  position: relative;
   padding: 0.5rem 0.8rem;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .modal-footer {
+  position: relative;
   display: flex;
   justify-content: end;
   padding: 0.5rem 1rem;
@@ -76,9 +106,47 @@
   flex: none;
   margin-left: 0.5rem;
 }
+
+.modal-scrollable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  padding: 1rem 0;
+  overflow-y: auto;
+}
+
+.modal-scrollable .modal-container {
+  flex: none;
+  max-height: max-content;
+}
+
+.modal-scrollable .modal-body {
+  overflow: visible !important;
+}
+
+.dark .modal-mask {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark .modal-container {
+  background-color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.66);
+}
+
+.dark .modal-header {
+  border-bottom: 1px solid #404040;
+}
+
+.dark .modal-footer {
+  border-top: 1px solid #404040;
+}
 </style>
 
-<script lang="js">
+<script>
+// https://codepen.io/immarina/pen/oNxXWKa
+
 export default {
   name: 'Modal',
   props: {
@@ -86,7 +154,19 @@ export default {
       type: Boolean,
       default: false
     },
+    colorScheme: {
+      type: String,
+      default: 'light'
+    },
+    scrollable: {
+      type: Boolean,
+      default: false
+    },
     closable: {
+      type: Boolean,
+      default: true
+    },
+    showClose: {
       type: Boolean,
       default: true
     },

@@ -1,6 +1,6 @@
 @import './base';
-@import './highlight/github-auto';
-@import '../../vue-inspector/styles/theme-auto';
+@import './highlight/github-custom';
+@import '../../vue-inspector/styles/theme-custom';
 
 .output-container {
   background: #f8f9fa;
@@ -45,7 +45,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+.dark {
   .output-container {
     background: rgb(30, 30, 30);
     color: rgb(213, 213, 213);

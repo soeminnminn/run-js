@@ -1,7 +1,7 @@
 <template>
   <div class="editor-wrapper" :style="{ width, height }">
     <div v-if="!isEditorReady" class="loading">
-      <slot>{{ 'loading...' }}</slot>
+      <Loading />
     </div>
     <div ref="containerRef" class="editor-container" :class="{ 'hide': !isEditorReady }"></div>
   </div>
@@ -30,20 +30,23 @@
 }
 </style>
 
-<script lang="js">
+<script>
 import { ref, shallowRef } from 'vue';
+import loader from './loader';
+import Loading from './Loading.vue';
 import * as monaco from 'monaco-editor';
 
-export function createModelUri(path) {
-  return monaco.Uri.parse(path);
-}
-export function getOrCreateModel(value, language, path) {
-  return  monaco.editor.getModel(createModelUri(path)) || 
-          monaco.editor.createModel(value, language, path ? createModelUri(path) : undefined);
+export function getOrCreateModel(monacoNs, value, language, path) {
+  return  monacoNs.editor.getModel(monacoNs.Uri.parse(path)) || 
+          monacoNs.editor.createModel(value, language, path ? 
+          monacoNs.Uri.parse(path) : undefined);
 }
 
 export default {
-  name: 'MonacoEditor',
+  name: 'Editor',
+  components: {
+    Loading
+  },
   props: {
     defaultValue: {
       type: String,
@@ -95,10 +98,15 @@ export default {
     'change',
     'validate'
   ],
+  setup() {
+    loader.config({ monaco });
+  },
   data() {
     return {
+      monacoLoader: null,
       viewStates: new Map(),
       editorRef: null,
+      monacoRef: null,
       disposeValidator: null,
     }
   },
@@ -123,6 +131,7 @@ export default {
     },
     path(newPath, oldPath) {
       const model = getOrCreateModel(
+        this.monacoRef,
         this.modelValue || this.defaultValue,
         this.language || this.defaultLanguage,
         newPath,
@@ -134,16 +143,23 @@ export default {
       }
     },
     theme(theme) {
-      monaco.editor.setTheme(theme);
+      if (this.monacoRef) {
+        this.monacoRef.editor.setTheme(theme);
+      }
     },
     language(language) {
       if (this.isEditorReady) {
-        monaco.editor.setModelLanguage(this.editorRef.getModel(), language);
+        this.monacoRef.editor.setModelLanguage(this.editorRef.getModel(), language);
       }
     },
     line(line) {
       if (this.editorRef && typeof(line) !== undefined) {
         this.editorRef.revealLine(line);
+      }
+    },
+    monacoRef(monacoRef) {
+      if (monacoRef) {
+        this.createEditor();
       }
     },
     editorRef(editorRef) {
@@ -163,7 +179,7 @@ export default {
     },
   },
   mounted() {
-    this.$nextTick(this.initEditor);
+    this.$nextTick(this.init);
   },
   unmounted() {
     if (this.disposeValidator) {
@@ -177,14 +193,28 @@ export default {
     }
   },
   methods: {
-    initEditor() {
+    async init() {
+      try {
+        const monacoLoader = loader.init();
+        this.monacoLoader = ref(monacoLoader);
+        
+        const monacoInstance = await monacoLoader;
+        this.monacoRef = shallowRef(monacoInstance);
+      } catch(error) {
+        if (error.type !== 'cancelation') {
+          console.error('Monaco initialization error:', error);
+        }
+      }
+    },
+    createEditor() {
       const containerRef = this.$refs.containerRef;
-      if (!containerRef || this.editorRef) {
+      if (!containerRef || !this.monacoRef || this.editorRef) {
         return;
       }
 
       const autoCreatedModelPath = this.path || this.defaultPath;
       const defaultModel = getOrCreateModel(
+        this.monacoRef,
         this.modelValue || this.defaultValue,
         this.language || this.defaultLanguage,
         autoCreatedModelPath,
@@ -203,7 +233,7 @@ export default {
         },
         this.overrideServices,
       );
-
+      
       editor.onDidChangeModelContent(event => {
         const value = editor.getValue();
         if (value !== this.modelValue) {
@@ -211,10 +241,47 @@ export default {
           this.$emit('change', value, event);
         }
       });
-
-      this.$emit('editorCreated', editor);
+      
+      this.$emit('editorCreated', { monaco: this.monacoRef, editor });
       this.editorRef = shallowRef(editor);
     },
+    setOption(key, value) {
+      if (!key || typeof key !== 'string') return;
+
+      const isArrayKey = (ak) => typeof ak === 'number' || (ak && /^[\d]+$/.test(ak));
+
+      const keys = key.split('.');
+      if (keys.length) {
+        const fk = keys.shift();
+        const fo = this.options[fk] || (isArrayKey(keys[0]) ? [] : {});
+        
+        let o = fo;
+        while(keys.length) {
+          const k = keys.shift();
+          if (!keys.length) {
+            o[k] = value;
+          } else {
+            o = o[k] || (isArrayKey(keys[0]) ? [] : {});
+          }
+        }
+
+        this.options[fk] = fo;
+      }
+    },
+    showCommandPalette() {
+      const editor = this.editorRef;
+      if (editor) {
+        editor.focus();
+        editor.trigger('', 'editor.action.quickCommand');
+      }
+    },
+    formatDocument() {
+      const editor = this.editorRef;
+      if (editor) {
+        editor.focus();
+        editor.trigger('', 'editor.action.formatDocument');
+      }
+    }
   },
 };
 </script>

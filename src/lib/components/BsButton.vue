@@ -27,7 +27,7 @@
   --bs-btn-bg: transparent;
   --bs-btn-border-width: 1px;
   --bs-btn-border-color: transparent;
-  --bs-btn-border-radius: 0.375rem;
+  --bs-btn-border-radius: 0.25rem;
   --bs-btn-hover-border-color: transparent;
   --bs-btn-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),0 1px 1px rgba(0, 0, 0, 0.075);
   --bs-btn-disabled-opacity: 0.65;
@@ -454,7 +454,7 @@
 }
 </style>
 
-<script lang="js">
+<script>
 const variants = [
   'none', 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark', 'link', 
   'outline-primary', 'outline-secondary', 'outline-success', 'outline-danger', 'outline-warning', 

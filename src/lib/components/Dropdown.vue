@@ -40,6 +40,11 @@
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 }
 
+.dark .dropdown-menu {
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #404040;
+}
+
 .dropdown-menu.dropdown-menu-right {
   right: 0;
   left: auto;
@@ -69,7 +74,7 @@
 }
 </style>
 
-<script lang="js">
+<script>
 export default {
   name: 'Dropdown',
   props: {

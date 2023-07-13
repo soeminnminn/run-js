@@ -16,8 +16,8 @@
   display: inline-block;
   background: #ccc;
   border-radius: 16px;
-  width: 2rem;
-  height: 1.15rem;
+  width: 1.75rem;
+  height: 1rem;
   position: relative;
   vertical-align: middle;
   transition: background 0.25s;
@@ -33,8 +33,8 @@
   width: 0.85rem;
   height: 0.85rem;
   position: absolute;
-  top: 0.15rem;
-  left: 0.17rem;
+  top: 0.05rem;
+  left: 0.05rem;
   transition: left 0.25s;
 }
 .toggle:hover .toggle-switch:before {
@@ -45,7 +45,7 @@
   background: #56c080;
 }
 .toggle-checkbox:checked + .toggle-switch:before {
-  left: 1rem;
+  left: 0.8rem;
 }
 
 .toggle-checkbox {
@@ -54,14 +54,13 @@
 }
 
 .toggle-label {
-  margin-left: 5px;
+  margin-left: 0.5rem;
   position: relative;
-  top: 2px;
+  top: 0.0625rem;
 }
 </style>
 
-<script lang="js">
-
+<script>
 export default {
   name: 'ToggleSwitch',
   props: {

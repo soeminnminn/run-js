@@ -1,8 +1,9 @@
 @import './base';
 @import './highlight/github-light';
+@import '../../vue-inspector/styles/theme-light';
 
 .output-container {
-  background: #f8f9fa;
+  background: #f6f6f6;
   color: #101010;
 }
 
@@ -40,6 +41,6 @@
   }
 
   .timestamp {
-    color: #8d8f91;
+    color: #8e8e8e;
   }
 }

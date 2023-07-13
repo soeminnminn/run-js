@@ -101,11 +101,11 @@ export default {
       }
     },
     updateScroll() {
-      const ele = this.$el;
-      this.$nextTick(() => ele.scrollTo(0, ele.scrollHeight));
+      const elm = this.$el;
+      this.$nextTick(() => elm.scrollTo(0, ele.scrollHeight));
     },
     handleClick(e) {
-      if (e.target == this.$el) {
+      if (this.$refs.editInput && e.target == this.$el) {
         this.$refs.editInput.focus();
       }
     },
